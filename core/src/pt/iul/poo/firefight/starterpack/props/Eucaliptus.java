@@ -7,9 +7,9 @@ import pt.iul.poo.firefight.starterpack.AbstractGameElement;
 //Tem atributos e metodos repetidos em relacao ao que est� definido noutras classes 
 //Isso sera' de evitar na versao a serio do projeto
 
-public class Pine extends AbstractGameElement {
+public class Eucaliptus extends AbstractGameElement {
 
-	public Pine(Point2D position) {
+	public Eucaliptus(Point2D position) {
 		super(position);
 	}
 

@@ -13,8 +13,6 @@ import pt.iul.ista.poo.observer.Observer;
 import pt.iul.ista.poo.utils.Direction;
 import pt.iul.ista.poo.utils.Point2D;
 import pt.iul.poo.firefight.starterpack.actors.Fireman;
-import pt.iul.poo.firefight.starterpack.behaviours.AbstractGameElement;
-import pt.iul.poo.firefight.starterpack.behaviours.UnknownGameElementException;
 import pt.iul.poo.firefight.starterpack.props.Land;
 
 // Note que esta classe e' um exemplo - nao pretende ser o inicio do projeto, 
@@ -97,6 +95,7 @@ public class GameEngine implements Observer {
 				line = scanner.nextLine().split(" ");
 				addGameElement(line[0], new Point2D(Integer.parseInt(line[1]), Integer.parseInt(line[2])));
 			}
+			y_coord++;
 		}
 		scanner.close();
 	}
@@ -109,11 +108,14 @@ public class GameEngine implements Observer {
 	}
 
 	private void addGameElement(String objectCode, Point2D position) {
-		if (objectCode != "_") {
+		if (!objectCode.equals("_")) {
 			AbstractGameElement element;
 			try {
 				element = AbstractGameElement.interpretGameElement(objectCode, position);
+				if (element instanceof Fireman)
+					this.fireman = (Fireman) element;
 				gameElements.add(element);
+
 			} catch (UnknownGameElementException e) {
 				e.printStackTrace();
 			}

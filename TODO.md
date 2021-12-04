@@ -1,4 +1,3 @@
-- Ler o ficheiro de configuração e representar os elementos na GUI
 - Implementar o modelo de propagação do fogo
 - Implementar interação bombeiro-bulldozer
 - Implementar movimento e interações do bulldozer

@@ -1,4 +1,4 @@
-package pt.iul.poo.firefight.starterpack.behaviours;
+package pt.iul.poo.firefight.starterpack;
 
 public class UnknownGameElementException extends Throwable{
     
