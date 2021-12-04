@@ -1,9 +1,9 @@
 package pt.iul.poo.firefight.starterpack.props;
 
 import pt.iul.ista.poo.utils.Point2D;
-import pt.iul.poo.firefight.starterpack.AbstractGameElement;
+import pt.iul.poo.firefight.starterpack.AbstractBurnableGameElement;
 
-public class Grass extends AbstractGameElement {
+public class Grass extends AbstractBurnableGameElement {
 
     public Grass(Point2D position) {
         super(position);
@@ -13,4 +13,14 @@ public class Grass extends AbstractGameElement {
 	public int getLayer() {
 		return 1;
 	}
+
+    @Override
+    public int getDefaultBurningFor() {
+        return 3;
+    }
+
+    @Override
+    public double getChanceOfCatchingFire() {
+        return 0.15;
+    }
 }

@@ -6,7 +6,7 @@ public class Main {
 		// Cria uma instancia de GameEngine e depois inicia o jogo
 		// Podera' vir a ficar diferente caso defina GameEngine como solitao
 		
-		GameEngine game = new GameEngine();
+		GameEngine game = GameEngine.getInstance();
 		game.start();
 		
 	}

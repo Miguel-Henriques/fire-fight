@@ -15,6 +15,6 @@ public class Fire extends AbstractGameElement {
 
 	@Override
 	public int getLayer() {
-		return 1;
+		return 2;
 	}
 }

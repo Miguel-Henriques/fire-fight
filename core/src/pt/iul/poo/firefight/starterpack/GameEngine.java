@@ -38,6 +38,7 @@ public class GameEngine implements Observer {
 	public static final String LEVELS_DIRECTORY = "core/levels"; // UPDATE THIS
 	public static final int INITIAL_LEVEL = 0;
 
+	private static GameEngine gameEngine = new GameEngine();
 	private ImageMatrixGUI gui; // Referencia para ImageMatrixGUI (janela de interface com o utilizador)
 	private List<AbstractGameElement> gameElements; // Lista de objetos
 	private Fireman fireman; // Referencia para o bombeiro
@@ -45,7 +46,7 @@ public class GameEngine implements Observer {
 	// Neste exemplo o setup inicial da janela que faz a interface com o utilizador
 	// e' feito no construtor
 	// Tambem poderia ser feito no main - estes passos tem sempre que ser feitos!
-	public GameEngine() {
+	private GameEngine() {
 
 		gui = ImageMatrixGUI.getInstance(); // 1. obter instancia ativa de ImageMatrixGUI
 		gui.setSize(GRID_HEIGHT, GRID_WIDTH); // 2. configurar as dimensoes
@@ -53,6 +54,10 @@ public class GameEngine implements Observer {
 		gui.go(); // 4. lancar a GUI
 
 		gameElements = new ArrayList<>();
+	}
+
+	public static GameEngine getInstance() {
+		return gameEngine;
 	}
 
 	// O metodo update() e' invocado sempre que o utilizador carrega numa tecla
@@ -70,7 +75,6 @@ public class GameEngine implements Observer {
 
 	// Criacao dos objetos e envio das imagens para GUI
 	public void start() {
-		// createTerrain(); // criar mapa do terreno
 		try {
 			loadScene(INITIAL_LEVEL);
 			sendImagesToGUI(); // enviar as imagens para a GUI
