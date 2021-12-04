@@ -1,0 +1,9 @@
+- Ler o ficheiro de configuração e representar os elementos na GUI
+- Implementar o modelo de propagação do fogo
+- Implementar interação bombeiro-bulldozer
+- Implementar movimento e interações do bulldozer
+- Implementar o avião e suas interações
+- o Implementar a mudança de mapa
+- Implementar o registo de pontuações em ficheiro
+- Implementar os novos elementos de jogo (a divulgar mais tarde)
+- Ponderar ajustes ao diagrama de classes
