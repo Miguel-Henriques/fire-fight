@@ -4,9 +4,9 @@ import pt.iul.ista.poo.utils.Direction;
 import pt.iul.ista.poo.utils.Point2D;
 import pt.iul.poo.firefight.starterpack.AbstractGameElement;
 import pt.iul.poo.firefight.starterpack.GameEngine;
-import pt.iul.poo.firefight.starterpack.behaviours.IMovable;
+import pt.iul.poo.firefight.starterpack.props.Fire;
 
-public class Fireman extends AbstractGameElement implements IMovable {
+public class Fireman extends AbstractGameElement implements IActor {
 
 	public Fireman(Point2D position) {
 		super(position);
@@ -15,9 +15,12 @@ public class Fireman extends AbstractGameElement implements IMovable {
 	@Override
 	public void move(Direction direction) {
 		Point2D newPosition = getPosition().plus(direction.asVector());
-
-		if (canMoveTo(newPosition)) {
-			setPosition(newPosition);
+		AbstractGameElement objectAt = GameEngine.getInstance().getUpperMostElement(newPosition);
+		if (objectAt instanceof Fire)
+			((Fire) objectAt).interact(this);
+		else {
+			if (canMoveTo(newPosition))
+				setPosition(newPosition);
 		}
 	}
 

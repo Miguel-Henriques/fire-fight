@@ -2,8 +2,8 @@ package pt.iul.poo.firefight.starterpack.behaviours;
 
 import pt.iul.poo.firefight.starterpack.AbstractGameElement;
 
-public interface IActiveElement {
+public interface IInteractable {
     
-    public void interact(AbstractGameElement actor);
+    public void interact(AbstractGameElement element);
 
 }

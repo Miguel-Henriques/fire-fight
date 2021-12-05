@@ -1,6 +1,6 @@
 package pt.iul.poo.firefight.starterpack.behaviours;
 
-import pt.iul.ista.poo.utils.Point2D;
+import pt.iul.poo.firefight.starterpack.BurningState;
 
 public interface IBurnable {
     
@@ -8,11 +8,11 @@ public interface IBurnable {
 
     public void setOnFire();
 
+    public void putFireOut(BurningState state);
+
     public int getDefaultBurningFor();
 
     public int getCurrentBurningFor();
-
-    public void spread(Point2D position);
 
     public double getChanceOfCatchingFire();
 }

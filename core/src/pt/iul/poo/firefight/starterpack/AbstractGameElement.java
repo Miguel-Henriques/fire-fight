@@ -2,14 +2,14 @@ package pt.iul.poo.firefight.starterpack;
 
 import pt.iul.ista.poo.gui.ImageTile;
 import pt.iul.ista.poo.utils.Point2D;
+import pt.iul.poo.firefight.starterpack.actors.Bulldozer;
 import pt.iul.poo.firefight.starterpack.actors.Fireman;
-import pt.iul.poo.firefight.starterpack.props.Bulldozer;
 import pt.iul.poo.firefight.starterpack.props.Eucaliptus;
 import pt.iul.poo.firefight.starterpack.props.Fire;
 import pt.iul.poo.firefight.starterpack.props.Grass;
 import pt.iul.poo.firefight.starterpack.props.Pine;
 
-public abstract class AbstractGameElement implements ImageTile {
+public abstract class AbstractGameElement implements ImageTile, Comparable<AbstractGameElement> {
 
     private Point2D position;
     private int layer;
@@ -55,5 +55,10 @@ public abstract class AbstractGameElement implements ImageTile {
             default:
                 throw new UnknownGameElementException();
         }
+    }
+
+    @Override
+    public int compareTo(AbstractGameElement o) {
+        return Integer.compare(o.getLayer(), this.getLayer());
     }
 }

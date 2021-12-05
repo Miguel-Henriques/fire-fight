@@ -2,65 +2,51 @@ package pt.iul.poo.firefight.starterpack;
 
 import pt.iul.ista.poo.utils.Point2D;
 import pt.iul.poo.firefight.starterpack.actors.Fireman;
-import pt.iul.poo.firefight.starterpack.behaviours.IActiveElement;
+import pt.iul.poo.firefight.starterpack.actors.Plane;
+import pt.iul.poo.firefight.starterpack.behaviours.IInteractable;
 import pt.iul.poo.firefight.starterpack.behaviours.IBurnable;
 import pt.iul.poo.firefight.starterpack.behaviours.IUpdatable;
-import pt.iul.poo.firefight.starterpack.props.Plane;
+import pt.iul.poo.firefight.starterpack.props.Fire;
 
 public abstract class AbstractBurnableGameElement extends AbstractGameElement
-        implements IBurnable, IActiveElement, IUpdatable {
+        implements IBurnable, IInteractable {
 
-    private boolean isBurning;
-    private int burningFor;
+    private BurningState state;
+    private Fire fire;
 
     public AbstractBurnableGameElement(Point2D position) {
         super(position);
-        isBurning = false;
-    }
-
-    public AbstractBurnableGameElement(Point2D position, boolean isBurning) {
-        super(position);
-        this.isBurning = isBurning;
     }
 
     @Override
     public boolean isBurning() {
-        return isBurning;
+        return state.equals(BurningState.BURNING);
     }
 
     @Override
     public void setOnFire() {
-        isBurning = true;
-        burningFor = getDefaultBurningFor();
+        fire = new Fire(this.getPosition());
+        fire.setBurningFor(getDefaultBurningFor());
+        state = BurningState.BURNING;
+        GameEngine.getInstance().addGameElement(fire);
+    }
+
+    @Override
+    public void putFireOut(BurningState state) {
+        fire = null;
+        this.state = state;
     }
 
     @Override
     public int getCurrentBurningFor() {
-        return burningFor;
+        return fire.getBurningFor();
     }
 
     @Override
-    public void interact(AbstractGameElement actor) {
-        if (actor instanceof Fireman || actor instanceof Plane) {
-            isBurning = false;
-            burningFor = 0;
-        }
+    public void interact(AbstractGameElement element) {
+        if (element instanceof Fire)
+            setOnFire();
         // if fire -> try catch fire
         // if bulldozer -> transform into land
-    }
-
-    @Override
-    public void update() {
-        if (isBurning()) {
-            if (--burningFor == 0)
-                isBurning = false;
-            else
-                spread(this.getPosition());
-        }
-    }
-
-    @Override
-    public void spread(Point2D position) {
-        //fetch neighbours, interact with each one of them if they are burnables   
     }
 }

@@ -3,6 +3,7 @@ package pt.iul.poo.firefight.starterpack;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -117,7 +118,7 @@ public class GameEngine implements Observer {
 			try {
 				element = AbstractGameElement.interpretGameElement(objectCode, position);
 				if (element instanceof Fireman)
-					this.fireman = (Fireman) element;
+					this.fireman = (Fireman) element;					
 				gameElements.add(element);
 
 			} catch (UnknownGameElementException e) {
@@ -128,5 +129,23 @@ public class GameEngine implements Observer {
 
 	private void addTerrain(Point2D position) {
 		gui.addImage(new Land(position));
+	}
+
+	public List<AbstractGameElement> getObjectsAt(Point2D position) {
+		return gameElements.stream().filter(element -> element.getPosition().equals(position)).collect(Collectors.toList());
+	}
+
+	public AbstractGameElement getUpperMostElement(Point2D position) {
+		return GameEngine.getInstance().getObjectsAt(position).stream().sorted().findFirst().orElse(new Land(position));
+	}
+
+	public void removeGameElement(AbstractGameElement element) {
+		gameElements.remove(element);
+		gui.removeImage(element);
+	}
+
+	public void addGameElement(AbstractGameElement element) {
+		gameElements.add(element);
+		gui.addImage(element);
 	}
 }
