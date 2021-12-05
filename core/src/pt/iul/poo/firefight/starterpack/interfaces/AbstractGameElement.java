@@ -1,4 +1,4 @@
-package pt.iul.poo.firefight.starterpack;
+package pt.iul.poo.firefight.starterpack.interfaces;
 
 import pt.iul.ista.poo.gui.ImageTile;
 import pt.iul.ista.poo.utils.Point2D;
@@ -8,6 +8,7 @@ import pt.iul.poo.firefight.starterpack.props.Eucaliptus;
 import pt.iul.poo.firefight.starterpack.props.Fire;
 import pt.iul.poo.firefight.starterpack.props.Grass;
 import pt.iul.poo.firefight.starterpack.props.Pine;
+import pt.iul.poo.firefight.starterpack.utils.UnknownGameElementException;
 
 public abstract class AbstractGameElement implements ImageTile, Comparable<AbstractGameElement> {
 

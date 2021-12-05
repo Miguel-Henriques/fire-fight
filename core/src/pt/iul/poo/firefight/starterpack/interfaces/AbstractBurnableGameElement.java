@@ -1,11 +1,13 @@
-package pt.iul.poo.firefight.starterpack;
+package pt.iul.poo.firefight.starterpack.interfaces;
 
 import java.util.SplittableRandom;
 
 import pt.iul.ista.poo.utils.Point2D;
-import pt.iul.poo.firefight.starterpack.behaviours.IInteractable;
-import pt.iul.poo.firefight.starterpack.behaviours.IBurnable;
+import pt.iul.poo.firefight.starterpack.GameEngine;
+import pt.iul.poo.firefight.starterpack.actors.Bulldozer;
 import pt.iul.poo.firefight.starterpack.props.Fire;
+import pt.iul.poo.firefight.starterpack.utils.BurningState;
+import pt.iul.poo.firefight.starterpack.utils.CacheOperation;
 
 public abstract class AbstractBurnableGameElement extends AbstractGameElement
         implements IBurnable, IInteractable {
@@ -27,11 +29,10 @@ public abstract class AbstractBurnableGameElement extends AbstractGameElement
     @Override
     public void trySetOnFire() {
         int random = new SplittableRandom().nextInt(0,100);
-        if (random <= getChanceOfCatchingFire() && state.equals(BurningState.NORMAL)) {
+        if ( state.equals(BurningState.NORMAL) && random <= getChanceOfCatchingFire() && GameEngine.getInstance().isUpperMostElement(this)) {
             fire = new Fire(this.getPosition());
             fire.setBurningFor(getDefaultBurningFor());
             state = BurningState.BURNING;
-            //GameEngine.getInstance().addGameElement(fire);
             GameEngine.getInstance().addToCache(fire, CacheOperation.ADD);
         }
     }
@@ -58,7 +59,8 @@ public abstract class AbstractBurnableGameElement extends AbstractGameElement
     public void interact(AbstractGameElement element) {
         if (element instanceof Fire)
             trySetOnFire();
-        // if bulldozer -> transform into land
+        if (element instanceof Bulldozer)
+            GameEngine.getInstance().addToCache(this, CacheOperation.DELETE);
     }
 
     @Override

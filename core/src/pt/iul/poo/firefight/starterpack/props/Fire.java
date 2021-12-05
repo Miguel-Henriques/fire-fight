@@ -1,15 +1,16 @@
 package pt.iul.poo.firefight.starterpack.props;
 
 import pt.iul.ista.poo.utils.Point2D;
-import pt.iul.poo.firefight.starterpack.AbstractBurnableGameElement;
-import pt.iul.poo.firefight.starterpack.AbstractGameElement;
-import pt.iul.poo.firefight.starterpack.BurningState;
-import pt.iul.poo.firefight.starterpack.CacheOperation;
 import pt.iul.poo.firefight.starterpack.GameEngine;
-import pt.iul.poo.firefight.starterpack.actors.IActor;
-import pt.iul.poo.firefight.starterpack.behaviours.IBurnable;
-import pt.iul.poo.firefight.starterpack.behaviours.IInteractable;
-import pt.iul.poo.firefight.starterpack.behaviours.IUpdatable;
+import pt.iul.poo.firefight.starterpack.actors.Bulldozer;
+import pt.iul.poo.firefight.starterpack.actors.Fireman;
+import pt.iul.poo.firefight.starterpack.interfaces.AbstractBurnableGameElement;
+import pt.iul.poo.firefight.starterpack.interfaces.AbstractGameElement;
+import pt.iul.poo.firefight.starterpack.interfaces.IBurnable;
+import pt.iul.poo.firefight.starterpack.interfaces.IInteractable;
+import pt.iul.poo.firefight.starterpack.interfaces.IUpdatable;
+import pt.iul.poo.firefight.starterpack.utils.BurningState;
+import pt.iul.poo.firefight.starterpack.utils.CacheOperation;
 
 public class Fire extends AbstractGameElement implements IUpdatable, IInteractable {
 
@@ -48,7 +49,7 @@ public class Fire extends AbstractGameElement implements IUpdatable, IInteractab
 	}
 
 	public void putFireOutWithBurntTrail(boolean leaveBurntTrail) {
-		//GameEngine.getInstance().removeGameElement(this);
+		// GameEngine.getInstance().removeGameElement(this);
 		GameEngine.getInstance().addToCache(this, CacheOperation.DELETE);
 		AbstractGameElement burntVegetation = GameEngine.getInstance().getBottomMostElement(this.getPosition());
 		if (burntVegetation instanceof AbstractBurnableGameElement) {
@@ -61,7 +62,14 @@ public class Fire extends AbstractGameElement implements IUpdatable, IInteractab
 
 	@Override
 	public void interact(AbstractGameElement element) {
-		if (element instanceof IActor)
+		if (element instanceof Fireman) {
 			putFireOutWithBurntTrail(false);
+			GameEngine.getInstance().renderVFX(new Water(this.getPosition(), ((Fireman) element).getLastInput()));
+			((Fireman) element).setCanMove(false);
+		}
+		if (element instanceof Bulldozer) {
+			putFireOutWithBurntTrail(false);
+			((IInteractable) GameEngine.getInstance().getBottomMostElement(this.getPosition())).interact(element);
+		}
 	}
 }

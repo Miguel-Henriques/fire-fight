@@ -1,5 +1,6 @@
 package pt.iul.poo.firefight.starterpack;
 
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,11 +16,16 @@ import pt.iul.ista.poo.observer.Observed;
 import pt.iul.ista.poo.observer.Observer;
 import pt.iul.ista.poo.utils.Direction;
 import pt.iul.ista.poo.utils.Point2D;
+import pt.iul.poo.firefight.starterpack.actors.Bulldozer;
 import pt.iul.poo.firefight.starterpack.actors.Fireman;
-import pt.iul.poo.firefight.starterpack.behaviours.IBurnable;
-import pt.iul.poo.firefight.starterpack.behaviours.IUpdatable;
+import pt.iul.poo.firefight.starterpack.interfaces.AbstractControllableActor;
+import pt.iul.poo.firefight.starterpack.interfaces.AbstractGameElement;
+import pt.iul.poo.firefight.starterpack.interfaces.IBurnable;
+import pt.iul.poo.firefight.starterpack.interfaces.IUpdatable;
 import pt.iul.poo.firefight.starterpack.props.Fire;
 import pt.iul.poo.firefight.starterpack.props.Land;
+import pt.iul.poo.firefight.starterpack.utils.CacheOperation;
+import pt.iul.poo.firefight.starterpack.utils.UnknownGameElementException;
 
 // Note que esta classe e' um exemplo - nao pretende ser o inicio do projeto, 
 // embora tambem possa ser usada para isso.
@@ -47,7 +53,8 @@ public class GameEngine implements Observer {
 	private static GameEngine gameEngine = new GameEngine();
 	private ImageMatrixGUI gui; // Referencia para ImageMatrixGUI (janela de interface com o utilizador)
 	private List<AbstractGameElement> gameElements; // Lista de objetos
-	private Fireman fireman; // Referencia para o bombeiro
+	private List<ImageTile> vfxs; // Lista de objeto
+	private AbstractControllableActor activeActor;
 	private Map<AbstractGameElement, CacheOperation> cachedChanges;
 
 	// Neste exemplo o setup inicial da janela que faz a interface com o utilizador
@@ -61,6 +68,7 @@ public class GameEngine implements Observer {
 		gui.go(); // 4. lancar a GUI
 
 		gameElements = new ArrayList<>();
+		vfxs = new ArrayList<>();
 		cachedChanges = new HashMap<>();
 	}
 
@@ -73,11 +81,17 @@ public class GameEngine implements Observer {
 	// (neste caso seria a GUI)
 	@Override
 	public void update(Observed source) {
+		clearVFXs();
 
 		int key = gui.keyPressed(); // obtem o codigo da tecla pressionada
 
 		if (Direction.isDirection(key))
-			fireman.move(Direction.directionFor(key));
+			activeActor.move(Direction.directionFor(key));
+		if (key == KeyEvent.VK_ENTER && activeActor instanceof Bulldozer) {
+			Fireman fireman = new Fireman(activeActor.getPosition());
+			setActiveActor(fireman);
+			addGameElement(fireman);
+		}
 
 		updateGameElements();
 		gui.update(); // redesenha as imagens na GUI, tendo em conta as novas posicoes
@@ -128,7 +142,7 @@ public class GameEngine implements Observer {
 			try {
 				element = AbstractGameElement.interpretGameElement(objectCode, position);
 				if (element instanceof Fireman)
-					this.fireman = (Fireman) element;
+					activeActor = (Fireman) element;
 				if (element instanceof Fire){
 					AbstractGameElement vegetation = getUpperMostElement(position);
 					if (vegetation instanceof IBurnable)
@@ -153,6 +167,10 @@ public class GameEngine implements Observer {
 
 	public AbstractGameElement getUpperMostElement(Point2D position) {
 		return GameEngine.getInstance().getObjectsAt(position).stream().sorted().findFirst().orElse(new Land(position));
+	}
+
+	public boolean isUpperMostElement(AbstractGameElement element) {
+		return getUpperMostElement(element.getPosition()).equals(element);
 	}
 
 	public AbstractGameElement getBottomMostElement(Point2D position) {
@@ -201,5 +219,22 @@ public class GameEngine implements Observer {
 
 	public void addToCache(AbstractGameElement element, CacheOperation action) {
 		cachedChanges.put(element, action);
+	}
+
+	public ImageMatrixGUI getGui() {
+		return gui;
+	}
+
+    public void renderVFX(ImageTile tile) {
+		gui.addImage(tile);
+		vfxs.add(tile);
+    }
+
+	public void clearVFXs() {
+		vfxs.forEach(vfx -> gui.removeImage(vfx));
+	}
+
+	public void setActiveActor(AbstractControllableActor actor) {
+		activeActor = actor;
 	}
 }

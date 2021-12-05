@@ -1,5 +1,3 @@
-- Implementar interação bombeiro-bulldozer
-- Implementar movimento e interações do bulldozer
 - Implementar o avião e suas interações
 - Implementar a mudança de mapa
 - Implementar o registo de pontuações em ficheiro
