@@ -20,7 +20,7 @@ public class Grass extends AbstractBurnableGameElement {
     }
 
     @Override
-    public double getChanceOfCatchingFire() {
-        return 0.15;
+    public int getChanceOfCatchingFire() {
+        return 15;
     }
 }

@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 import pt.iul.ista.poo.gui.ImageMatrixGUI;
@@ -14,6 +16,9 @@ import pt.iul.ista.poo.observer.Observer;
 import pt.iul.ista.poo.utils.Direction;
 import pt.iul.ista.poo.utils.Point2D;
 import pt.iul.poo.firefight.starterpack.actors.Fireman;
+import pt.iul.poo.firefight.starterpack.behaviours.IBurnable;
+import pt.iul.poo.firefight.starterpack.behaviours.IUpdatable;
+import pt.iul.poo.firefight.starterpack.props.Fire;
 import pt.iul.poo.firefight.starterpack.props.Land;
 
 // Note que esta classe e' um exemplo - nao pretende ser o inicio do projeto, 
@@ -43,6 +48,7 @@ public class GameEngine implements Observer {
 	private ImageMatrixGUI gui; // Referencia para ImageMatrixGUI (janela de interface com o utilizador)
 	private List<AbstractGameElement> gameElements; // Lista de objetos
 	private Fireman fireman; // Referencia para o bombeiro
+	private Map<AbstractGameElement, CacheOperation> cachedChanges;
 
 	// Neste exemplo o setup inicial da janela que faz a interface com o utilizador
 	// e' feito no construtor
@@ -55,6 +61,7 @@ public class GameEngine implements Observer {
 		gui.go(); // 4. lancar a GUI
 
 		gameElements = new ArrayList<>();
+		cachedChanges = new HashMap<>();
 	}
 
 	public static GameEngine getInstance() {
@@ -71,6 +78,8 @@ public class GameEngine implements Observer {
 
 		if (Direction.isDirection(key))
 			fireman.move(Direction.directionFor(key));
+
+		updateGameElements();
 		gui.update(); // redesenha as imagens na GUI, tendo em conta as novas posicoes
 	}
 
@@ -79,6 +88,7 @@ public class GameEngine implements Observer {
 		try {
 			loadScene(INITIAL_LEVEL);
 			sendImagesToGUI(); // enviar as imagens para a GUI
+			gui.update();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -93,12 +103,12 @@ public class GameEngine implements Observer {
 			if (y_coord < 10) {
 				line = scanner.nextLine().split("");
 				for (int x_coord = 0; x_coord < line.length; x_coord++) {
-					addGameElement(line[x_coord], new Point2D(x_coord, y_coord));
 					addTerrain(new Point2D(x_coord, y_coord));
+					initGameElement(line[x_coord], new Point2D(x_coord, y_coord));
 				}
 			} else {
 				line = scanner.nextLine().split(" ");
-				addGameElement(line[0], new Point2D(Integer.parseInt(line[1]), Integer.parseInt(line[2])));
+				initGameElement(line[0], new Point2D(Integer.parseInt(line[1]), Integer.parseInt(line[2])));
 			}
 			y_coord++;
 		}
@@ -112,13 +122,18 @@ public class GameEngine implements Observer {
 		gui.addImages(gameElements.stream().map(object -> (ImageTile) object).collect(Collectors.toList()));
 	}
 
-	private void addGameElement(String objectCode, Point2D position) {
+	private void initGameElement(String objectCode, Point2D position) {
 		if (!objectCode.equals("_")) {
 			AbstractGameElement element;
 			try {
 				element = AbstractGameElement.interpretGameElement(objectCode, position);
 				if (element instanceof Fireman)
-					this.fireman = (Fireman) element;					
+					this.fireman = (Fireman) element;
+				if (element instanceof Fire){
+					AbstractGameElement vegetation = getUpperMostElement(position);
+					if (vegetation instanceof IBurnable)
+						((IBurnable) vegetation).setOnFire((Fire)element);
+				}
 				gameElements.add(element);
 
 			} catch (UnknownGameElementException e) {
@@ -132,11 +147,16 @@ public class GameEngine implements Observer {
 	}
 
 	public List<AbstractGameElement> getObjectsAt(Point2D position) {
-		return gameElements.stream().filter(element -> element.getPosition().equals(position)).collect(Collectors.toList());
+		return gameElements.stream().filter(element -> element.getPosition().equals(position))
+				.collect(Collectors.toList());
 	}
 
 	public AbstractGameElement getUpperMostElement(Point2D position) {
 		return GameEngine.getInstance().getObjectsAt(position).stream().sorted().findFirst().orElse(new Land(position));
+	}
+
+	public AbstractGameElement getBottomMostElement(Point2D position) {
+		return GameEngine.getInstance().getObjectsAt(position).stream().sorted(Collections.reverseOrder()).findFirst().orElse(new Land(position));
 	}
 
 	public void removeGameElement(AbstractGameElement element) {
@@ -147,5 +167,39 @@ public class GameEngine implements Observer {
 	public void addGameElement(AbstractGameElement element) {
 		gameElements.add(element);
 		gui.addImage(element);
+	}
+
+	public List<AbstractGameElement> getNeighbours(Point2D origin) {
+		List<Point2D> referencePoints = new ArrayList<>();
+
+		referencePoints.add(origin.plus(Direction.LEFT.asVector()));
+		referencePoints.add(origin.plus(Direction.RIGHT.asVector()));
+		referencePoints.add(origin.plus(Direction.UP.asVector()));
+		referencePoints.add(origin.plus(Direction.DOWN.asVector()));
+
+		return gameElements.stream().filter(element -> referencePoints.contains(element.getPosition()))
+				.collect(Collectors.toList());
+	}
+
+	public void updateGameElements() {
+		gameElements.forEach(element -> {
+			if (element instanceof IUpdatable)
+				((IUpdatable) element).update();
+		});
+		releaseCacheChanges();
+	}
+
+	public void releaseCacheChanges() {
+		cachedChanges.keySet().forEach(object -> {
+			if (cachedChanges.get(object).equals(CacheOperation.ADD))
+				addGameElement(object);
+			else
+				removeGameElement(object);
+		});
+		cachedChanges.clear();
+	}
+
+	public void addToCache(AbstractGameElement element, CacheOperation action) {
+		cachedChanges.put(element, action);
 	}
 }

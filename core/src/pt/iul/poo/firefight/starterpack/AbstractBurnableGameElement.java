@@ -1,11 +1,10 @@
 package pt.iul.poo.firefight.starterpack;
 
+import java.util.SplittableRandom;
+
 import pt.iul.ista.poo.utils.Point2D;
-import pt.iul.poo.firefight.starterpack.actors.Fireman;
-import pt.iul.poo.firefight.starterpack.actors.Plane;
 import pt.iul.poo.firefight.starterpack.behaviours.IInteractable;
 import pt.iul.poo.firefight.starterpack.behaviours.IBurnable;
-import pt.iul.poo.firefight.starterpack.behaviours.IUpdatable;
 import pt.iul.poo.firefight.starterpack.props.Fire;
 
 public abstract class AbstractBurnableGameElement extends AbstractGameElement
@@ -16,6 +15,8 @@ public abstract class AbstractBurnableGameElement extends AbstractGameElement
 
     public AbstractBurnableGameElement(Point2D position) {
         super(position);
+        fire = null;
+        state = BurningState.NORMAL;
     }
 
     @Override
@@ -24,11 +25,22 @@ public abstract class AbstractBurnableGameElement extends AbstractGameElement
     }
 
     @Override
-    public void setOnFire() {
-        fire = new Fire(this.getPosition());
-        fire.setBurningFor(getDefaultBurningFor());
+    public void trySetOnFire() {
+        int random = new SplittableRandom().nextInt(0,100);
+        if (random <= getChanceOfCatchingFire() && state.equals(BurningState.NORMAL)) {
+            fire = new Fire(this.getPosition());
+            fire.setBurningFor(getDefaultBurningFor());
+            state = BurningState.BURNING;
+            //GameEngine.getInstance().addGameElement(fire);
+            GameEngine.getInstance().addToCache(fire, CacheOperation.ADD);
+        }
+    }
+
+    @Override
+    public void setOnFire(Fire fire) {
         state = BurningState.BURNING;
-        GameEngine.getInstance().addGameElement(fire);
+        this.fire = fire;
+        fire.setBurningFor(getDefaultBurningFor());
     }
 
     @Override
@@ -45,8 +57,12 @@ public abstract class AbstractBurnableGameElement extends AbstractGameElement
     @Override
     public void interact(AbstractGameElement element) {
         if (element instanceof Fire)
-            setOnFire();
-        // if fire -> try catch fire
+            trySetOnFire();
         // if bulldozer -> transform into land
+    }
+
+    @Override
+    public String getName() {
+        return state.getState() + super.getName();
     }
 }

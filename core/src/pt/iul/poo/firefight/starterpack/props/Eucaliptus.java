@@ -24,7 +24,7 @@ public class Eucaliptus extends AbstractBurnableGameElement {
 	}
 
 	@Override
-	public double getChanceOfCatchingFire() {
-		return 0.10;
+	public int getChanceOfCatchingFire() {
+		return 10;
 	}
 }

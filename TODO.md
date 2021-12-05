@@ -1,4 +1,3 @@
-- Implementar o modelo de propagação do fogo
 - Implementar interação bombeiro-bulldozer
 - Implementar movimento e interações do bulldozer
 - Implementar o avião e suas interações

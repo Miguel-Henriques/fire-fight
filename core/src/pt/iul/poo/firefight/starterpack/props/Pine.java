@@ -21,7 +21,7 @@ public class Pine extends AbstractBurnableGameElement {
 	}
 
 	@Override
-	public double getChanceOfCatchingFire() {
-		return 0.05;
+	public int getChanceOfCatchingFire() {
+		return 5;
 	}
 }
