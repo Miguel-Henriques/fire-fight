@@ -18,6 +18,7 @@ import pt.iul.ista.poo.utils.Direction;
 import pt.iul.ista.poo.utils.Point2D;
 import pt.iul.poo.firefight.starterpack.actors.Bulldozer;
 import pt.iul.poo.firefight.starterpack.actors.Fireman;
+import pt.iul.poo.firefight.starterpack.actors.Plane;
 import pt.iul.poo.firefight.starterpack.interfaces.AbstractControllableActor;
 import pt.iul.poo.firefight.starterpack.interfaces.AbstractGameElement;
 import pt.iul.poo.firefight.starterpack.interfaces.IBurnable;
@@ -87,10 +88,16 @@ public class GameEngine implements Observer {
 
 		if (Direction.isDirection(key))
 			activeActor.move(Direction.directionFor(key));
+
 		if (key == KeyEvent.VK_ENTER && activeActor instanceof Bulldozer) {
 			Fireman fireman = new Fireman(activeActor.getPosition());
 			setActiveActor(fireman);
 			addGameElement(fireman);
+		}
+
+		if (key == KeyEvent.VK_P) {
+			Plane plane = new Plane(new Point2D(mostFireActiveColumn(), 9));
+			addGameElement(plane);
 		}
 
 		updateGameElements();
@@ -236,5 +243,20 @@ public class GameEngine implements Observer {
 
 	public void setActiveActor(AbstractControllableActor actor) {
 		activeActor = actor;
+	}
+
+	public int mostFireActiveColumn() {
+		int mostActiveColumn = 0;
+		int mostActiveColumnFireCount = 0;
+		List<AbstractGameElement> listOfFires = gameElements.stream().filter(element -> element instanceof Fire).collect(Collectors.toList());
+		for (int column = 0; column < 10; column++) {
+			final int currentColumn = column; //Workaround for lambda enclosed non final local variables
+			int columnFireCount = (int) listOfFires.stream().filter(element -> element.getPosition().getX() == currentColumn).count();
+			if (columnFireCount > mostActiveColumnFireCount){
+				mostActiveColumn = column;
+				mostActiveColumnFireCount = columnFireCount;
+			}
+		}
+		return mostActiveColumn;
 	}
 }
