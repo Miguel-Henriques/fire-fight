@@ -1,7 +1,6 @@
 package pt.iul.poo.firefight.starterpack.interfaces;
 
 import pt.iul.ista.poo.utils.Direction;
-import pt.iul.ista.poo.utils.Point2D;
 
 public interface IMovable {
     
@@ -9,7 +8,7 @@ public interface IMovable {
 
     public Direction getLastInput();
 
-    boolean isWithinBounds(Point2D p);
+    public void setLastInput(Direction lastInput);
 
     void setCanMove(boolean canMove);
 

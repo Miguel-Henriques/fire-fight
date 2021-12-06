@@ -13,7 +13,6 @@ public abstract class AbstractControllableActor extends AbstractGameElement impl
 		super(position);
 	}
 
-	@Override
 	public boolean isWithinBounds(Point2D p) {
 		if (p.getX() < 0)
 			return false;
@@ -31,6 +30,7 @@ public abstract class AbstractControllableActor extends AbstractGameElement impl
 		return lastInput;
 	}
 
+	@Override
 	public void setLastInput(Direction lastInput) {
 		this.lastInput = lastInput;
 	}

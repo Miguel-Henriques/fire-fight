@@ -5,6 +5,7 @@ import pt.iul.poo.firefight.starterpack.GameEngine;
 import pt.iul.poo.firefight.starterpack.actors.Bulldozer;
 import pt.iul.poo.firefight.starterpack.actors.Fireman;
 import pt.iul.poo.firefight.starterpack.interfaces.AbstractBurnableGameElement;
+import pt.iul.poo.firefight.starterpack.interfaces.AbstractControllableActor;
 import pt.iul.poo.firefight.starterpack.interfaces.AbstractGameElement;
 import pt.iul.poo.firefight.starterpack.interfaces.IBurnable;
 import pt.iul.poo.firefight.starterpack.interfaces.IInteractable;
@@ -62,14 +63,14 @@ public class Fire extends AbstractGameElement implements IUpdatable, IInteractab
 
 	@Override
 	public void interact(AbstractGameElement element) {
-		if (element instanceof Fireman) {
+		if (element instanceof AbstractControllableActor) {
 			putFireOutWithBurntTrail(false);
-			GameEngine.getInstance().renderVFX(new Water(this.getPosition(), ((Fireman) element).getLastInput()));
-			((Fireman) element).setCanMove(false);
-		}
-		if (element instanceof Bulldozer) {
-			putFireOutWithBurntTrail(false);
-			((IInteractable) GameEngine.getInstance().getBottomMostElement(this.getPosition())).interact(element);
+			if (element instanceof Fireman) {
+				GameEngine.getInstance().renderVFX(new Water(this.getPosition(), ((Fireman) element).getLastInput()));
+				((Fireman) element).setCanMove(false);
+			}
+			if (element instanceof Bulldozer)
+				((IInteractable) GameEngine.getInstance().getBottomMostElement(this.getPosition())).interact(element);
 		}
 	}
 }

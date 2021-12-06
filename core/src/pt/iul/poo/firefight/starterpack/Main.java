@@ -7,7 +7,6 @@ public class Main {
 		// Podera' vir a ficar diferente caso defina GameEngine como solitao
 		
 		GameEngine game = GameEngine.getInstance();
-		game.start();
-		
+		game.loadLevel(0);
 	}
 }

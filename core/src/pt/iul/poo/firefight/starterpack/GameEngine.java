@@ -50,6 +50,8 @@ public class GameEngine implements Observer {
 	public static final int GRID_WIDTH = 10;
 	public static final String LEVELS_DIRECTORY = "core/levels"; // UPDATE THIS
 	public static final int INITIAL_LEVEL = 0;
+	public int currentLevel;
+	public int numOflevels;
 
 	private static GameEngine gameEngine = new GameEngine();
 	private ImageMatrixGUI gui; // Referencia para ImageMatrixGUI (janela de interface com o utilizador)
@@ -71,6 +73,8 @@ public class GameEngine implements Observer {
 		gameElements = new ArrayList<>();
 		vfxs = new ArrayList<>();
 		cachedChanges = new HashMap<>();
+		currentLevel = 0;
+		numOflevels = availableLevels();
 	}
 
 	public static GameEngine getInstance() {
@@ -102,13 +106,24 @@ public class GameEngine implements Observer {
 
 		updateGameElements();
 		gui.update(); // redesenha as imagens na GUI, tendo em conta as novas posicoes
+
+		if(activeFires()==0) {
+			if(currentLevel < numOflevels-1)
+				loadLevel(++currentLevel);
+			else
+				loadScoreboard();
+		}
 	}
 
-	// Criacao dos objetos e envio das imagens para GUI
-	public void start() {
+	private void loadScoreboard() {
+		gui.setStatusMessage("Congratulations, you've just won! Score: " + 0); //WIP
+	}
+
+	public void loadLevel(int level) {
 		try {
-			loadScene(INITIAL_LEVEL);
-			sendImagesToGUI(); // enviar as imagens para a GUI
+			clear();
+			loadScene(level);
+			sendImagesToGUI();
 			gui.update();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -214,7 +229,7 @@ public class GameEngine implements Observer {
 		releaseCacheChanges();
 	}
 
-	public void releaseCacheChanges() {
+	private void releaseCacheChanges() {
 		cachedChanges.keySet().forEach(object -> {
 			if (cachedChanges.get(object).equals(CacheOperation.ADD))
 				addGameElement(object);
@@ -226,10 +241,6 @@ public class GameEngine implements Observer {
 
 	public void addToCache(AbstractGameElement element, CacheOperation action) {
 		cachedChanges.put(element, action);
-	}
-
-	public ImageMatrixGUI getGui() {
-		return gui;
 	}
 
     public void renderVFX(ImageTile tile) {
@@ -258,5 +269,20 @@ public class GameEngine implements Observer {
 			}
 		}
 		return mostActiveColumn;
+	}
+
+	public int activeFires() {
+		return (int) gameElements.stream().filter(element -> element instanceof Fire).count();
+	}
+
+	public void clear() {
+		gui.removeImages(gameElements.stream().map(element -> (ImageTile) element).collect(Collectors.toList()));
+		clearVFXs();
+		cachedChanges.clear();
+		gameElements.clear();
+	}
+
+	public int availableLevels() {
+		return new File(LEVELS_DIRECTORY).listFiles().length;
 	}
 }

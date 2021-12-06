@@ -1,5 +1,3 @@
-- Implementar o avião e suas interações
-- Implementar a mudança de mapa
 - Implementar o registo de pontuações em ficheiro
 - Implementar os novos elementos de jogo (a divulgar mais tarde)
 - Ponderar ajustes ao diagrama de classes
