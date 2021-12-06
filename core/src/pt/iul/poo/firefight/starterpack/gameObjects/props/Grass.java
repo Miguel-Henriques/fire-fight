@@ -1,7 +1,7 @@
-package pt.iul.poo.firefight.starterpack.props;
+package pt.iul.poo.firefight.starterpack.gameObjects.props;
 
 import pt.iul.ista.poo.utils.Point2D;
-import pt.iul.poo.firefight.starterpack.interfaces.AbstractBurnableGameElement;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.AbstractBurnableGameElement;
 
 public class Grass extends AbstractBurnableGameElement {
 
@@ -22,5 +22,10 @@ public class Grass extends AbstractBurnableGameElement {
     @Override
     public int getChanceOfCatchingFire() {
         return 15;
+    }
+
+    @Override
+    public int extinguishedFirePoints() {
+        return 3;
     }
 }

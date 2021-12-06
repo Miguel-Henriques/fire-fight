@@ -1,8 +1,9 @@
-package pt.iul.poo.firefight.starterpack.interfaces;
+package pt.iul.poo.firefight.starterpack.gameObjects.interfaces;
 
 import pt.iul.ista.poo.utils.Direction;
 import pt.iul.ista.poo.utils.Point2D;
-import pt.iul.poo.firefight.starterpack.GameEngine;
+import pt.iul.poo.firefight.starterpack.engine.GameEngine;
+import pt.iul.poo.firefight.starterpack.utils.GameElementsUtils;
 
 public abstract class AbstractControllableActor extends AbstractGameElement implements IMovable {
 
@@ -52,7 +53,7 @@ public abstract class AbstractControllableActor extends AbstractGameElement impl
 
 		if (isWithinBounds(newPosition)) {
 			setCanMove(true);
-			AbstractGameElement objectAt = GameEngine.getInstance().getUpperMostElement(newPosition);
+			AbstractGameElement objectAt = GameElementsUtils.getUpperMostElement(GameEngine.getInstance().getGameElements(), newPosition);
 			if (objectAt instanceof IInteractable)
 				((IInteractable) objectAt).interact(this);
 			if (canMove())

@@ -1,8 +1,8 @@
-package pt.iul.poo.firefight.starterpack.props;
+package pt.iul.poo.firefight.starterpack.gameObjects.props;
 
 import pt.iul.ista.poo.utils.Direction;
 import pt.iul.ista.poo.utils.Point2D;
-import pt.iul.poo.firefight.starterpack.interfaces.AbstractGameElement;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.AbstractGameElement;
 
 public class Water extends AbstractGameElement {
 

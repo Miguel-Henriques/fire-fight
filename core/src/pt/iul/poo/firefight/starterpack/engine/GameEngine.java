@@ -1,10 +1,9 @@
-package pt.iul.poo.firefight.starterpack;
+package pt.iul.poo.firefight.starterpack.engine;
 
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,49 +15,38 @@ import pt.iul.ista.poo.observer.Observed;
 import pt.iul.ista.poo.observer.Observer;
 import pt.iul.ista.poo.utils.Direction;
 import pt.iul.ista.poo.utils.Point2D;
-import pt.iul.poo.firefight.starterpack.actors.Bulldozer;
-import pt.iul.poo.firefight.starterpack.actors.Fireman;
-import pt.iul.poo.firefight.starterpack.actors.Plane;
-import pt.iul.poo.firefight.starterpack.interfaces.AbstractControllableActor;
-import pt.iul.poo.firefight.starterpack.interfaces.AbstractGameElement;
-import pt.iul.poo.firefight.starterpack.interfaces.IBurnable;
-import pt.iul.poo.firefight.starterpack.interfaces.IUpdatable;
-import pt.iul.poo.firefight.starterpack.props.Fire;
-import pt.iul.poo.firefight.starterpack.props.Land;
+import pt.iul.poo.firefight.starterpack.gameObjects.actors.Bulldozer;
+import pt.iul.poo.firefight.starterpack.gameObjects.actors.Fireman;
+import pt.iul.poo.firefight.starterpack.gameObjects.actors.Plane;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.AbstractControllableActor;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.AbstractGameElement;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.IBurnable;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.IUpdatable;
+import pt.iul.poo.firefight.starterpack.gameObjects.props.Fire;
+import pt.iul.poo.firefight.starterpack.gameObjects.props.Land;
 import pt.iul.poo.firefight.starterpack.utils.CacheOperation;
+import pt.iul.poo.firefight.starterpack.utils.GameElementsUtils;
 import pt.iul.poo.firefight.starterpack.utils.UnknownGameElementException;
-
-// Note que esta classe e' um exemplo - nao pretende ser o inicio do projeto, 
-// embora tambem possa ser usada para isso.
-//
-// No seu projeto e' suposto haver metodos diferentes.
-// 
-// As coisas que comuns com o projeto, e que se pretendem ilustrar aqui, sao:
-// - GameEngine implementa Observer - para  ter o metodo update(...)  
-// - Configurar a janela do interface grafico (GUI):
-//        + definir as dimensoes
-//        + registar o objeto GameEngine ativo como observador da GUI
-//        + lancar a GUI
-// - O metodo update(...) e' invocado automaticamente sempre que se carrega numa tecla
-//
-// Tudo o mais podera' ser diferente!
 
 public class GameEngine implements Observer {
 
 	// Dimensoes da grelha de jogo
+	public static final String PLAYER = "Sargento 'tá' quentinho";
 	public static final int GRID_HEIGHT = 10;
 	public static final int GRID_WIDTH = 10;
 	public static final String LEVELS_DIRECTORY = "core/levels"; // UPDATE THIS
 	public static final int INITIAL_LEVEL = 0;
-	public int currentLevel;
-	public int numOflevels;
+	private int currentLevel;
+	private int numOflevels;
+	private boolean isComplete;
 
 	private static GameEngine gameEngine = new GameEngine();
 	private ImageMatrixGUI gui; // Referencia para ImageMatrixGUI (janela de interface com o utilizador)
 	private List<AbstractGameElement> gameElements; // Lista de objetos
-	private List<ImageTile> vfxs; // Lista de objeto
-	private AbstractControllableActor activeActor;
-	private Map<AbstractGameElement, CacheOperation> cachedChanges;
+	private List<ImageTile> vfxs; // Lista de efeitos
+	private AbstractControllableActor activeActor; // Actor ativo
+	private Map<AbstractGameElement, CacheOperation> cachedChanges; // Mudanças em memória(cache)
+	private PointScoringSystem score;
 
 	// Neste exemplo o setup inicial da janela que faz a interface com o utilizador
 	// e' feito no construtor
@@ -73,8 +61,9 @@ public class GameEngine implements Observer {
 		gameElements = new ArrayList<>();
 		vfxs = new ArrayList<>();
 		cachedChanges = new HashMap<>();
-		currentLevel = 0;
+		currentLevel = INITIAL_LEVEL;
 		numOflevels = availableLevels();
+		score = new PointScoringSystem(PLAYER);
 	}
 
 	public static GameEngine getInstance() {
@@ -86,10 +75,27 @@ public class GameEngine implements Observer {
 	// (neste caso seria a GUI)
 	@Override
 	public void update(Observed source) {
+		if(isComplete)
+			return;
+
 		clearVFXs();
 
 		int key = gui.keyPressed(); // obtem o codigo da tecla pressionada
+		interpretInput(key);
+		
+		updateGameElements();
+		updateScoreInfo();
+		gui.update(); // redesenha as imagens na GUI, tendo em conta as novas posicoes
 
+		if(GameElementsUtils.activeFires(gameElements)==0) {
+			if(currentLevel < numOflevels-1)
+				loadLevel(++currentLevel);
+			else
+				loadFinishMessage();
+		}
+	}
+
+	private void interpretInput(int key) {
 		if (Direction.isDirection(key))
 			activeActor.move(Direction.directionFor(key));
 
@@ -100,29 +106,32 @@ public class GameEngine implements Observer {
 		}
 
 		if (key == KeyEvent.VK_P) {
-			Plane plane = new Plane(new Point2D(mostFireActiveColumn(), 9));
+			Plane plane = new Plane(new Point2D(GameElementsUtils.mostFireActiveColumn(gameElements), 9));
 			addGameElement(plane);
-		}
-
-		updateGameElements();
-		gui.update(); // redesenha as imagens na GUI, tendo em conta as novas posicoes
-
-		if(activeFires()==0) {
-			if(currentLevel < numOflevels-1)
-				loadLevel(++currentLevel);
-			else
-				loadScoreboard();
 		}
 	}
 
-	private void loadScoreboard() {
-		gui.setStatusMessage("Congratulations, you've just won! Score: " + 0); //WIP
+	private void updateScoreInfo() {
+		gui.setStatusMessage(score.getScoreMessage());
+	}
+
+	private void loadFinishMessage() {
+		System.out.println("Rendered");
+		try {
+			score.registerScore();
+			gui.setStatusMessage("Congratulations, you've just completed the game! " + score.getScoreMessage());
+			isComplete=true;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	public void loadLevel(int level) {
 		try {
 			clear();
 			loadScene(level);
+			updateScoreInfo();
 			sendImagesToGUI();
 			gui.update();
 		} catch (IOException e) {
@@ -166,7 +175,7 @@ public class GameEngine implements Observer {
 				if (element instanceof Fireman)
 					activeActor = (Fireman) element;
 				if (element instanceof Fire){
-					AbstractGameElement vegetation = getUpperMostElement(position);
+					AbstractGameElement vegetation = GameElementsUtils.getUpperMostElement(gameElements, position);
 					if (vegetation instanceof IBurnable)
 						((IBurnable) vegetation).setOnFire((Fire)element);
 				}
@@ -182,23 +191,6 @@ public class GameEngine implements Observer {
 		gui.addImage(new Land(position));
 	}
 
-	public List<AbstractGameElement> getObjectsAt(Point2D position) {
-		return gameElements.stream().filter(element -> element.getPosition().equals(position))
-				.collect(Collectors.toList());
-	}
-
-	public AbstractGameElement getUpperMostElement(Point2D position) {
-		return GameEngine.getInstance().getObjectsAt(position).stream().sorted().findFirst().orElse(new Land(position));
-	}
-
-	public boolean isUpperMostElement(AbstractGameElement element) {
-		return getUpperMostElement(element.getPosition()).equals(element);
-	}
-
-	public AbstractGameElement getBottomMostElement(Point2D position) {
-		return GameEngine.getInstance().getObjectsAt(position).stream().sorted(Collections.reverseOrder()).findFirst().orElse(new Land(position));
-	}
-
 	public void removeGameElement(AbstractGameElement element) {
 		gameElements.remove(element);
 		gui.removeImage(element);
@@ -207,18 +199,6 @@ public class GameEngine implements Observer {
 	public void addGameElement(AbstractGameElement element) {
 		gameElements.add(element);
 		gui.addImage(element);
-	}
-
-	public List<AbstractGameElement> getNeighbours(Point2D origin) {
-		List<Point2D> referencePoints = new ArrayList<>();
-
-		referencePoints.add(origin.plus(Direction.LEFT.asVector()));
-		referencePoints.add(origin.plus(Direction.RIGHT.asVector()));
-		referencePoints.add(origin.plus(Direction.UP.asVector()));
-		referencePoints.add(origin.plus(Direction.DOWN.asVector()));
-
-		return gameElements.stream().filter(element -> referencePoints.contains(element.getPosition()))
-				.collect(Collectors.toList());
 	}
 
 	public void updateGameElements() {
@@ -256,25 +236,6 @@ public class GameEngine implements Observer {
 		activeActor = actor;
 	}
 
-	public int mostFireActiveColumn() {
-		int mostActiveColumn = 0;
-		int mostActiveColumnFireCount = 0;
-		List<AbstractGameElement> listOfFires = gameElements.stream().filter(element -> element instanceof Fire).collect(Collectors.toList());
-		for (int column = 0; column < 10; column++) {
-			final int currentColumn = column; //Workaround for lambda enclosed non final local variables
-			int columnFireCount = (int) listOfFires.stream().filter(element -> element.getPosition().getX() == currentColumn).count();
-			if (columnFireCount > mostActiveColumnFireCount){
-				mostActiveColumn = column;
-				mostActiveColumnFireCount = columnFireCount;
-			}
-		}
-		return mostActiveColumn;
-	}
-
-	public int activeFires() {
-		return (int) gameElements.stream().filter(element -> element instanceof Fire).count();
-	}
-
 	public void clear() {
 		gui.removeImages(gameElements.stream().map(element -> (ImageTile) element).collect(Collectors.toList()));
 		clearVFXs();
@@ -284,5 +245,13 @@ public class GameEngine implements Observer {
 
 	public int availableLevels() {
 		return new File(LEVELS_DIRECTORY).listFiles().length;
+	}
+
+	public void addToScore(int points) {
+		score.addToScore(points);
+	}
+
+	public final List<AbstractGameElement> getGameElements() {
+		return gameElements;
 	}
 }

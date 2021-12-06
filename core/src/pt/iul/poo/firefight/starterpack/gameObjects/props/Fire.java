@@ -1,17 +1,18 @@
-package pt.iul.poo.firefight.starterpack.props;
+package pt.iul.poo.firefight.starterpack.gameObjects.props;
 
 import pt.iul.ista.poo.utils.Point2D;
-import pt.iul.poo.firefight.starterpack.GameEngine;
-import pt.iul.poo.firefight.starterpack.actors.Bulldozer;
-import pt.iul.poo.firefight.starterpack.actors.Fireman;
-import pt.iul.poo.firefight.starterpack.interfaces.AbstractBurnableGameElement;
-import pt.iul.poo.firefight.starterpack.interfaces.AbstractControllableActor;
-import pt.iul.poo.firefight.starterpack.interfaces.AbstractGameElement;
-import pt.iul.poo.firefight.starterpack.interfaces.IBurnable;
-import pt.iul.poo.firefight.starterpack.interfaces.IInteractable;
-import pt.iul.poo.firefight.starterpack.interfaces.IUpdatable;
+import pt.iul.poo.firefight.starterpack.engine.GameEngine;
+import pt.iul.poo.firefight.starterpack.gameObjects.actors.Bulldozer;
+import pt.iul.poo.firefight.starterpack.gameObjects.actors.Fireman;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.AbstractBurnableGameElement;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.AbstractControllableActor;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.AbstractGameElement;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.IBurnable;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.IInteractable;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.IUpdatable;
 import pt.iul.poo.firefight.starterpack.utils.BurningState;
 import pt.iul.poo.firefight.starterpack.utils.CacheOperation;
+import pt.iul.poo.firefight.starterpack.utils.GameElementsUtils;
 
 public class Fire extends AbstractGameElement implements IUpdatable, IInteractable {
 
@@ -43,16 +44,15 @@ public class Fire extends AbstractGameElement implements IUpdatable, IInteractab
 	}
 
 	public void spread() {
-		GameEngine.getInstance().getNeighbours(this.getPosition()).forEach(neighbour -> {
+		GameElementsUtils.getNeighbours(GameEngine.getInstance().getGameElements(), this.getPosition()).forEach(neighbour -> {
 			if (neighbour instanceof AbstractBurnableGameElement)
 				((AbstractBurnableGameElement) neighbour).interact(this);
 		});
 	}
 
 	public void putFireOutWithBurntTrail(boolean leaveBurntTrail) {
-		// GameEngine.getInstance().removeGameElement(this);
 		GameEngine.getInstance().addToCache(this, CacheOperation.DELETE);
-		AbstractGameElement burntVegetation = GameEngine.getInstance().getBottomMostElement(this.getPosition());
+		AbstractGameElement burntVegetation = GameElementsUtils.getBottomMostElement(GameEngine.getInstance().getGameElements(), this.getPosition());
 		if (burntVegetation instanceof AbstractBurnableGameElement) {
 			if (leaveBurntTrail)
 				((IBurnable) burntVegetation).putFireOut(BurningState.BURNT);
@@ -70,7 +70,7 @@ public class Fire extends AbstractGameElement implements IUpdatable, IInteractab
 				((Fireman) element).setCanMove(false);
 			}
 			if (element instanceof Bulldozer)
-				((IInteractable) GameEngine.getInstance().getBottomMostElement(this.getPosition())).interact(element);
+				((IInteractable) GameElementsUtils.getBottomMostElement(GameEngine.getInstance().getGameElements(),this.getPosition())).interact(element);
 		}
 	}
 }

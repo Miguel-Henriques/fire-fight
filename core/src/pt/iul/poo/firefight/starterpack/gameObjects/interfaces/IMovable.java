@@ -1,4 +1,4 @@
-package pt.iul.poo.firefight.starterpack.interfaces;
+package pt.iul.poo.firefight.starterpack.gameObjects.interfaces;
 
 import pt.iul.ista.poo.utils.Direction;
 

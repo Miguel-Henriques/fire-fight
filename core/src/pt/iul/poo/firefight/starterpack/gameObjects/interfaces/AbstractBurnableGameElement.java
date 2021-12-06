@@ -1,16 +1,17 @@
-package pt.iul.poo.firefight.starterpack.interfaces;
+package pt.iul.poo.firefight.starterpack.gameObjects.interfaces;
 
 import java.util.SplittableRandom;
 
 import pt.iul.ista.poo.utils.Point2D;
-import pt.iul.poo.firefight.starterpack.GameEngine;
-import pt.iul.poo.firefight.starterpack.actors.Bulldozer;
-import pt.iul.poo.firefight.starterpack.props.Fire;
+import pt.iul.poo.firefight.starterpack.engine.GameEngine;
+import pt.iul.poo.firefight.starterpack.gameObjects.actors.Bulldozer;
+import pt.iul.poo.firefight.starterpack.gameObjects.props.Fire;
 import pt.iul.poo.firefight.starterpack.utils.BurningState;
 import pt.iul.poo.firefight.starterpack.utils.CacheOperation;
+import pt.iul.poo.firefight.starterpack.utils.GameElementsUtils;
 
 public abstract class AbstractBurnableGameElement extends AbstractGameElement
-        implements IBurnable, IInteractable {
+        implements IBurnable, IInteractable, IScore {
 
     private BurningState state;
     private Fire fire;
@@ -29,7 +30,7 @@ public abstract class AbstractBurnableGameElement extends AbstractGameElement
     @Override
     public void trySetOnFire() {
         int random = new SplittableRandom().nextInt(0,100);
-        if ( state.equals(BurningState.NORMAL) && random <= getChanceOfCatchingFire() && GameEngine.getInstance().isUpperMostElement(this)) {
+        if ( state.equals(BurningState.NORMAL) && random <= getChanceOfCatchingFire() && GameElementsUtils.isUpperMostElement(GameEngine.getInstance().getGameElements(), this)) {
             fire = new Fire(this.getPosition());
             fire.setBurningFor(getDefaultBurningFor());
             state = BurningState.BURNING;
@@ -48,6 +49,10 @@ public abstract class AbstractBurnableGameElement extends AbstractGameElement
     public void putFireOut(BurningState state) {
         fire = null;
         this.state = state;
+        if (state.equals(BurningState.BURNT))
+            GameEngine.getInstance().addToScore(burntPenaltyPoints());
+        else
+            GameEngine.getInstance().addToScore(extinguishedFirePoints());
     }
 
     @Override
@@ -66,5 +71,10 @@ public abstract class AbstractBurnableGameElement extends AbstractGameElement
     @Override
     public String getName() {
         return state.getState() + super.getName();
+    }
+
+    @Override
+    public int burntPenaltyPoints() {
+        return -1;
     }
 }

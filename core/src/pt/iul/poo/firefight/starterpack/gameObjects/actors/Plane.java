@@ -1,13 +1,14 @@
-package pt.iul.poo.firefight.starterpack.actors;
+package pt.iul.poo.firefight.starterpack.gameObjects.actors;
 
 import pt.iul.ista.poo.utils.Direction;
 import pt.iul.ista.poo.utils.Point2D;
-import pt.iul.poo.firefight.starterpack.GameEngine;
-import pt.iul.poo.firefight.starterpack.interfaces.AbstractControllableActor;
-import pt.iul.poo.firefight.starterpack.interfaces.AbstractGameElement;
-import pt.iul.poo.firefight.starterpack.interfaces.IInteractable;
-import pt.iul.poo.firefight.starterpack.interfaces.IUpdatable;
+import pt.iul.poo.firefight.starterpack.engine.GameEngine;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.AbstractControllableActor;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.AbstractGameElement;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.IInteractable;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.IUpdatable;
 import pt.iul.poo.firefight.starterpack.utils.CacheOperation;
+import pt.iul.poo.firefight.starterpack.utils.GameElementsUtils;
 
 public class Plane extends AbstractControllableActor implements IUpdatable {
 
@@ -41,7 +42,7 @@ public class Plane extends AbstractControllableActor implements IUpdatable {
         Point2D newPosition = getPosition().plus(direction.asVector());
 
         if (isWithinBounds(newPosition)) {
-            AbstractGameElement objectAt = GameEngine.getInstance().getUpperMostElement(newPosition);
+            AbstractGameElement objectAt = GameElementsUtils.getUpperMostElement(GameEngine.getInstance().getGameElements(), newPosition);
             if (objectAt instanceof IInteractable)
                 ((IInteractable) objectAt).interact(this);
         } else {

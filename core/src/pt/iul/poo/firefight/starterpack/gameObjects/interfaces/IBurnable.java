@@ -1,6 +1,6 @@
-package pt.iul.poo.firefight.starterpack.interfaces;
+package pt.iul.poo.firefight.starterpack.gameObjects.interfaces;
 
-import pt.iul.poo.firefight.starterpack.props.Fire;
+import pt.iul.poo.firefight.starterpack.gameObjects.props.Fire;
 import pt.iul.poo.firefight.starterpack.utils.BurningState;
 
 public interface IBurnable {

@@ -1,7 +1,7 @@
-package pt.iul.poo.firefight.starterpack.props;
+package pt.iul.poo.firefight.starterpack.gameObjects.props;
 
 import pt.iul.ista.poo.utils.Point2D;
-import pt.iul.poo.firefight.starterpack.interfaces.AbstractBurnableGameElement;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.AbstractBurnableGameElement;
 
 //Esta classe de exemplo esta' definida de forma muito basica, sem relacoes de heranca
 //Tem atributos e metodos repetidos em relacao ao que est� definido noutras classes 
@@ -26,5 +26,10 @@ public class Eucaliptus extends AbstractBurnableGameElement {
 	@Override
 	public int getChanceOfCatchingFire() {
 		return 10;
+	}
+
+	@Override
+	public int extinguishedFirePoints() {
+		return 2;
 	}
 }

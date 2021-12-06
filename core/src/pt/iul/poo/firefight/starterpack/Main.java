@@ -1,5 +1,7 @@
 package pt.iul.poo.firefight.starterpack;
 
+import pt.iul.poo.firefight.starterpack.engine.GameEngine;
+
 public class Main {
 	public static void main(String[] args) {
 		

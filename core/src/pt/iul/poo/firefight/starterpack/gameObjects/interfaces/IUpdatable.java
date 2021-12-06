@@ -1,4 +1,4 @@
-package pt.iul.poo.firefight.starterpack.interfaces;
+package pt.iul.poo.firefight.starterpack.gameObjects.interfaces;
 
 /**
  * Turn based updates

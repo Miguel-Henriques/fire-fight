@@ -1,7 +1,7 @@
-package pt.iul.poo.firefight.starterpack.actors;
+package pt.iul.poo.firefight.starterpack.gameObjects.actors;
 
 import pt.iul.ista.poo.utils.Point2D;
-import pt.iul.poo.firefight.starterpack.interfaces.AbstractControllableActor;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.AbstractControllableActor;
 
 public class Fireman extends AbstractControllableActor {
 

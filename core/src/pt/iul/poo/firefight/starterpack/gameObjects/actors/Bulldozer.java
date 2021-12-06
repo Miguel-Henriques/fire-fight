@@ -1,10 +1,10 @@
-package pt.iul.poo.firefight.starterpack.actors;
+package pt.iul.poo.firefight.starterpack.gameObjects.actors;
 
 import pt.iul.ista.poo.utils.Point2D;
-import pt.iul.poo.firefight.starterpack.GameEngine;
-import pt.iul.poo.firefight.starterpack.interfaces.AbstractControllableActor;
-import pt.iul.poo.firefight.starterpack.interfaces.AbstractGameElement;
-import pt.iul.poo.firefight.starterpack.interfaces.IInteractable;
+import pt.iul.poo.firefight.starterpack.engine.GameEngine;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.AbstractControllableActor;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.AbstractGameElement;
+import pt.iul.poo.firefight.starterpack.gameObjects.interfaces.IInteractable;
 import pt.iul.poo.firefight.starterpack.utils.CacheOperation;
 
 public class Bulldozer extends AbstractControllableActor implements IInteractable {

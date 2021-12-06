@@ -1,3 +1,0 @@
-- Implementar o registo de pontuações em ficheiro
-- Implementar os novos elementos de jogo (a divulgar mais tarde)
-- Ponderar ajustes ao diagrama de classes
