@@ -1,6 +1,6 @@
 # Fire Fight
 
-![fire-fight-game](/docs/Firefight.png)
+![fire-fight-game](/docs/Firefight.PNG)
   
 Fire fight is a turn-based fire fighting simulation 2D game built on Java.  
 It was built to showcase Java's Object Oriented Programming core concepts in the scope of an OOP subject as part of my computer science degree.
